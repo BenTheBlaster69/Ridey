@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RideNow — Uber‑like Ride Hailing MVP</title>
+  <meta name="description" content="Request–match–ride–pay. A fast, safe ride hailing MVP." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Cpath d='M14 45h36v5H14zM17 14h7l8 26h-7zM40 14h7l-8 26h-7z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #0b0d12; --panel:#11141a; --muted:#9aa3af; --text:#e5e7eb; --brand:#4f46e5; --brand-2:#22c55e; --stroke:#1f2937;
+      --max: 1120px; --rad: 14px; --shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    * { box-sizing: border-box }
+    html,body { margin:0; height:100%; background: radial-gradient(1200px 600px at 70% -10%, rgba(79,70,229,.25), transparent 60%) , var(--bg); color:var(--text); font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial; }
+    a { color: var(--text); text-decoration: none }
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 20px }
+    header { position: sticky; top:0; backdrop-filter:saturate(140%) blur(8px); background:rgba(11,13,18,.6); border-bottom:1px solid var(--stroke); z-index: 10 }
+    .nav { display:flex; align-items:center; justify-content:space-between; height:64px }
+    .logo { display:flex; gap:10px; align-items:center; font-weight:700; letter-spacing:.2px }
+    .chip { padding:2px 10px; border:1px solid var(--stroke); border-radius:999px; font-size:12px; color:var(--muted) }
+    .btn { display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px; font-weight:600; border:1px solid transparent; cursor:pointer; transition:.2s transform,.2s filter,.2s background }
+    .btn.primary { background: linear-gradient(135deg, var(--brand), #7c3aed); }
+    .btn.ghost { border-color:var(--stroke); background:transparent; color:var(--text) }
+    .btn:hover { transform: translateY(-1px); filter:brightness(1.05) }
+    .hero { display:grid; grid-template-columns: 1.15fr 1fr; gap:32px; padding:64px 0 24px }
+    .card { background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)); border:1px solid var(--stroke); border-radius:var(--rad); box-shadow:var(--shadow) }
+    .hero .pane { padding:28px }
+    .hero h1 { font-size: clamp(28px, 4vw, 52px); line-height:1.05; margin: 0 0 14px }
+    .hero p { color:var(--muted); margin:0 0 18px }
+    .badges { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 20px }
+    .grid { display:grid; gap:16px }
+    .features { padding: 36px 0 }
+    .feature { padding:20px; border:1px solid var(--stroke); border-radius:12px; background:var(--panel) }
+    .feature h3 { margin:8px 0 4px; font-size:18px }
+    .feature p { margin:0; color:var(--muted) }
+    .how { padding: 10px 0 40px }
+    .how-steps { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px }
+    .step { padding:18px; border:1px dashed var(--stroke); border-radius:12px }
+    .pill { font:12px/1.2 monospace; color:var(--brand-2); background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.3); padding:2px 8px; border-radius:999px }
+    .screens { padding: 8px; background:var(--panel); border-radius:12px; border:1px solid var(--stroke) }
+    .screen { aspect-ratio: 9/19.5; border:1px solid var(--stroke); border-radius:24px; background:
+      radial-gradient(160px 240px at 30% 0%, rgba(79,70,229,.25), rgba(79,70,229,0) 60%),
+      linear-gradient(180deg,#0f1320,#0b0d12); position:relative; overflow:hidden }
+    .pin { position:absolute; width:14px; height:14px; border-radius:999px; background:#22c55e; top:40%; left:28%; box-shadow:0 0 0 6px rgba(34,197,94,.15) }
+    .car { position:absolute; width:28px; height:14px; background:#fff; border-radius:10px; bottom:22%; left:14%; animation: drive 7s linear infinite }
+    @keyframes drive { 0%{ left:12% } 50%{ left:64% } 100%{ left:12% } }
+    form { display:grid; gap:10px }
+    input, select { background:#0e121a; color:var(--text); border:1px solid var(--stroke); border-radius:10px; padding:12px 14px }
+    .cta { display:flex; gap:10px; flex-wrap:wrap }
+    .notice { color:var(--muted); font-size:13px }
+    footer { border-top:1px solid var(--stroke); padding:28px 0 60px; color:var(--muted) }
+    .cols { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">
+        <img alt="" width="28" height="28" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Cpath d='M14 45h36v5H14zM17 14h7l8 26h-7zM40 14h7l-8 26h-7z' fill='%23fff'/%3E%3C/svg%3E">
+        RideNow
+        <span class="chip">MVP</span>
+      </div>
+      <nav class="cta">
+        <a href="#waitlist" class="btn ghost">Join waitlist</a>
+        <a href="#download" class="btn primary">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="pane card">
+        <h1>Tap. Match. Go.</h1>
+        <p>Uber‑like ride hailing built on a modern, scalable stack: real‑time dispatch, safe payments, and accurate ETAs.</p>
+        <div class="badges">
+          <span class="pill">Node 22 • Postgres 17 • Redis GEO</span>
+          <span class="pill">Stripe Connect • Flutter</span>
+        </div>
+        <div class="cols">
+          <form id="waitlist" class="card" style="padding:16px" autocomplete="on">
+            <h3 style="margin:0 0 8px">Join the waitlist</h3>
+            <input name="name" placeholder="Your name" required />
+            <input name="email" type="email" placeholder="Email" required />
+            <select name="role" required>
+              <option value="">I am a…</option>
+              <option>Rider</option>
+              <option>Driver</option>
+              <option>Partner</option>
+            </select>
+            <button class="btn primary" type="submit">Notify me</button>
+            <div class="notice">We’ll only use your email for launch updates.</div>
+          </form>
+
+          <div class="screens">
+            <div class="screen">
+              <div class="pin" title="Pickup"></div>
+              <div class="car" title="Driver"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="pane card" id="download">
+        <h2 style="margin:0 0 8px">Download</h2>
+        <p class="notice">Test builds will be available via TestFlight (iOS) and Play Internal (Android) during the pilot.</p>
+        <div class="grid">
+          <a class="btn ghost" href="#" aria-disabled="true">iOS • Coming soon</a>
+          <a class="btn ghost" href="#" aria-disabled="true">Android • Coming soon</a>
+          <a class="btn" style="background:#0e121a;border-color:var(--stroke)" href="#docs">See the architecture →</a>
+        </div>
+        <hr style="border:0;border-top:1px solid var(--stroke); margin:18px 0" />
+        <h3 style="margin:0 0 6px">What’s inside</h3>
+        <ul style="margin:0 0 10px 18px; color:var(--muted)">
+          <li>Real‑time dispatch with WebSockets</li>
+          <li>Secure payments via Stripe</li>
+          <li>Driver KYC and weekly payouts</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="features" id="features">
+      <h2>Why RideNow</h2>
+      <div class="how-steps">
+        <div class="feature">
+          <h3>Lightning‑fast matching</h3>
+          <p>Nearest‑driver assignment using Redis GEO and offer timeouts.</p>
+        </div>
+        <div class="feature">
+          <h3>Transparent pricing</h3>
+          <p>Fare estimate upfront, captured on completion.</p>
+        </div>
+        <div class="feature">
+          <h3>Safety first</h3>
+          <p>SOS shortcut, trip sharing, and driver document checks.</p>
+        </div>
+        <div class="feature">
+          <h3>Built to scale</h3>
+          <p>AWS + Postgres + Redis with observability baked in.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="docs">
+      <h2>The flow at a glance</h2>
+      <div class="how-steps">
+        <div class="step"><span class="pill">1</span> Rider requests with pickup & dropoff</div>
+        <div class="step"><span class="pill">2</span> Dispatch offers to nearest available driver</div>
+        <div class="step"><span class="pill">3</span> Navigate, ride, complete</div>
+        <div class="step"><span class="pill">4</span> Stripe captures, both sides rate</div>
+      </div>
+      <details style="margin-top:14px">
+        <summary>Show high‑level spec</summary>
+        <pre style="white-space:pre-wrap; color:var(--muted); border:1px solid var(--stroke); border-radius:12px; padding:12px; background:#0e121a;">
+Requirements (MVP): rider & driver apps, real‑time map, matching/dispatch, payments & payouts, ratings, admin console.
+Stack: Flutter • Node 22 • Postgres 17 + PostGIS • Redis GEO • Stripe Connect • KYC provider.
+        </pre>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container cols">
+      <div>
+        <div class="logo" style="margin-bottom:6px">
+          <img alt="" width="24" height="24" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Cpath d='M14 45h36v5H14zM17 14h7l8 26h-7zM40 14h7l-8 26h-7z' fill='%23fff'/%3E%3C/svg%3E">
+          RideNow
+        </div>
+        <div class="notice">© <span id="year"></span> RideNow. All rights reserved.</div>
+      </div>
+      <div>
+        <div class="notice">Contact</div>
+        <a class="btn ghost" href="mailto:hello@ridenow.app">hello@ridenow.app</a>
+      </div>
+      <div>
+        <div class="notice">Legal</div>
+        <div class="notice">By using this site you agree to our terms and privacy policy.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Tiny progressive enhancement: waitlist form (stores locally + mailto fallback)
+    (function () {
+      const form = document.getElementById('waitlist');
+      const year = document.getElementById('year');
+      if (year) year.textContent = new Date().getFullYear();
+
+      form?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        try {
+          const key = 'ridenow_waitlist';
+          const existing = JSON.parse(localStorage.getItem(key) || '[]');
+          existing.push({ ...data, ts: new Date().toISOString() });
+          localStorage.setItem(key, JSON.stringify(existing));
+        } catch {}
+        const mail = encodeURIComponent(
+          `Please add me to the waitlist.\n\nName: ${data.name}\nEmail: ${data.email}\nRole: ${data.role}\n`
+        );
+        window.location.href = `mailto:hello@ridenow.app?subject=Waitlist&body=${mail}`;
+      });
+    })();
+  </script>
+</body>
+</html>
